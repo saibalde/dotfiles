@@ -1,0 +1,120 @@
+#!/bin/sh
+
+progname=$(basename $0)
+
+sub_help() {
+    echo "Usage:"
+    echo "    $progname <subcommand>"
+    echo ""
+    echo "Subcommands:"
+    echo "    install     install necessary packages"
+    echo "    configure   set up some of the configuration scripts"
+    echo "    nmsetup     configure network manager"
+    echo "    help        print this message"
+    echo ""
+}
+
+sub_install() {
+    # update database
+    apt-get update -y
+    apt-get upgrade -y
+
+    # install display drivers
+    apt-get install -y ubuntu-drivers-common
+    apt-get install -y xorg xserver-xorg
+    apt-get install -y mesa-utils mesa-utils-extra
+
+    # install i3 desktop
+    apt-get install -y i3
+    apt-get install -y gnome-terminal
+    apt-get install -y nautilus
+
+    # install utilities
+    apt-get install -y curl
+    apt-get install -y git
+    apt-get install -y vim
+    apt-get install -y snapd
+    apt-get install -y evince
+    apt-get install -y gdebi
+    apt-get install -y nautilus-dropbox
+    apt-get install -y volumeicon-alsa
+
+    # install appearance modifying packages
+    apt-get install -y lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
+    apt-get install -y ubuntu-wallpapers
+    apt-get install -y dmz-cursor-theme lxappearance
+    apt-get install -y rofi
+    apt-get install -y compton
+
+    # install browser
+    snap install firefox
+}
+
+sub_configure() {
+    # install adobe source fonts
+    git clone https://github.com/adobe-fonts/source-serif-pro.git
+    git clone https://github.com/adobe-fonts/source-sans-pro.git
+    git clone https://github.com/adobe-fonts/source-code-pro.git
+    if [ ! -d ~/.local/share/fonts ]; then
+        mkdir -p ~/.local/share/fonts
+    fi
+    mv source-serif-pro/TTF/*.ttf ~/.local/share/fonts
+    mv source-sans-pro/TTF/*.ttf ~/.local/share/fonts
+    mv source-code-pro/TTF/*.ttf ~/.local/share/fonts
+    rm -rf source-serif-pro/
+    rm -rf source-sans-pro/
+    rm -rf source-code-pro/
+    fc-cache -fv
+
+    # configure i3
+    mkdir -p ~/.config
+    ln -s $PWD/config/i3 ~/.config/i3
+    ln -s $PWD/config/i3status ~/.config/i3status
+
+    # setup bash
+    mv ~/.bashrc ~/.bashrc.bak
+    echo ". $PWD/bashrc" >> ~/.bashrc
+    ln -s $PWD/inputrc ~/.inputrc
+
+    # setup vim
+    ln -s $PWD/vim ~/.vim
+    git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+    vim +PluginInstall +qall
+
+    # setup git
+    ln -s $PWD/gitconfig ~/.gitconfig
+
+    # install dropbox daemon
+    dropbox start -i
+}
+
+sub_nmsetup() {
+    apt-get install -y network-manager network-manager-gnome
+    systemctl enable NetworkManager.service
+    systemctl start NetworkManager.service
+    if [ -f /etc/netplan/01-netcfg.yaml ]; then
+        mv /etc/netplan/01-netcfg.yaml /etc/netplan/01-netcfg.yaml.bak
+    fi
+    echo "network:" >> /etc/netplan/01-netcfg.yaml
+    echo "  version: 2" >> /etc/netplan/01-netcfg.yaml 
+    echo "  renderer: NetworkManager" >> /etc/netplan/01-netcfg.yaml  
+    netplan --debug generate
+    netplan apply
+}
+
+subcommand=$1
+case $subcommand in
+    "" | "-h" | "--help")
+        sub_help
+        ;;
+    *)
+        shift
+        sub_${subcommand} $@
+        if [ $? = 127 ]; then
+            echo "Error:"
+            echo "    $subcommand is not a known subcommand" >&2
+            echo "    Run  '$progname help' for a list of known subcommands" >&2
+            exit 1
+        fi
+        ;;
+esac
