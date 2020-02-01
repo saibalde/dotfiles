@@ -26,16 +26,22 @@ sub_install() {
 
     # install i3 desktop
     apt-get install -y i3
+
+    # install terminal, file manager and browser
     apt-get install -y gnome-terminal
+
     apt-get install -y nautilus
 
-    # install utilities
     apt-get install -y curl
+    curl https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o google-chrome-stable_current_amd64.deb
+    dpkg -i google-chrome-stable_current_amd64.deb
+    rm google-chrome-stable_current_amd64.deb
+    apt-get install -f
+
+    # install utilities
     apt-get install -y git
     apt-get install -y vim
-    apt-get install -y snapd
     apt-get install -y evince
-    apt-get install -y gdebi
     apt-get install -y nautilus-dropbox
     apt-get install -y volumeicon-alsa
 
@@ -45,9 +51,6 @@ sub_install() {
     apt-get install -y dmz-cursor-theme lxappearance
     apt-get install -y rofi
     apt-get install -y compton
-
-    # install browser
-    snap install firefox
 }
 
 sub_configure() {
