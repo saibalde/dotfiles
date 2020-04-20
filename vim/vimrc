@@ -41,9 +41,17 @@ nnoremap <C-l> <C-w>l
 
 " always use latex
 let g:tex_flavor = 'latex'
+
 augroup tex
     autocmd!
-    autocmd filetype tex set tabstop=2 softtabstop=2 shiftwidth=2
-    autocmd filetype tex set textwidth=80
-    autocmd filetype tex set spell
+    autocmd filetype tex setlocal tabstop=2 softtabstop=2 shiftwidth=2
+    autocmd filetype tex setlocal textwidth=80
+    autocmd filetype tex setlocal spell
+augroup END
+
+augroup bib
+    autocmd!
+    autocmd filetype bib setlocal tabstop=2 softtabstop=2 shiftwidth=2
+    autocmd filetype bib setlocal nowrap
+    autocmd filetype bib setlocal spell
 augroup END
