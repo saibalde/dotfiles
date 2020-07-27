@@ -3,7 +3,7 @@
 
 # source global definitions
 if [ -f /etc/bashrc ]; then
-    source /etc/bashrc
+    . /etc/bashrc
 fi
 
 # ignore commands beginning with a space
