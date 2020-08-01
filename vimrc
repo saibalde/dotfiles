@@ -5,10 +5,7 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
 Plugin 'VundleVim/Vundle.vim'
-
-Plugin 'preservim/nerdtree'
 Plugin 'vim-airline/vim-airline'
-Plugin 'christoomey/vim-tmux-navigator'
 
 call vundle#end()
 
@@ -23,35 +20,19 @@ set expandtab
 set autoindent
 set smartindent
 
-" line numbers
-set number
-set numberwidth=5
-
-" right margin
-set colorcolumn=81
-
-" nerdtree
-nnoremap <leader>n :NERDTreeToggle<CR>
-
 " split switch
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
-" always use latex
-let g:tex_flavor = 'latex'
-
-augroup tex
+" filetype setups
+augroup c
     autocmd!
-    autocmd filetype tex setlocal tabstop=2 softtabstop=2 shiftwidth=2
-    autocmd filetype tex setlocal textwidth=80
-    autocmd filetype tex setlocal spell
-augroup END
+    autocmd BufNewFile,BufRead *.h,*.c set filetype=c.doxygen
+augroup end
 
-augroup bib
+augroup cpp
     autocmd!
-    autocmd filetype bib setlocal tabstop=2 softtabstop=2 shiftwidth=2
-    autocmd filetype bib setlocal nowrap
-    autocmd filetype bib setlocal spell
-augroup END
+    autocmd BufNewFile,BufRead *.hpp,*.cpp,*.tpp set filetype=cpp.doxygen
+augroup end
