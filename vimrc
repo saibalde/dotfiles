@@ -33,6 +33,7 @@ filetype plugin indent on
 syntax on
 
 " colorscheme
+set background=dark
 colorscheme gruvbox
 
 " NERDTree
