@@ -60,16 +60,16 @@ nnoremap <C-l> <C-w>l
 augroup c
     autocmd!
     autocmd BufNewFile,BufFilePre,BufRead *.h,*.c set filetype=c.doxygen
-    autocmd filetype c set colorcolumn=81
+    autocmd FileType c set colorcolumn=81
 augroup end
 
 augroup cpp
     autocmd!
     autocmd BufNewFile,BufFilePre,BufRead *.hpp,*.cpp,*.tpp set filetype=cpp.doxygen
-    autocmd filetype cpp set colorcolumn=81
+    autocmd FileType cpp set colorcolumn=81
 augroup end
 
 augroup python
     autocmd!
-    autocmd filetype python set colorcolumn=81
+    autocmd FileType python set colorcolumn=81
 augroup end
