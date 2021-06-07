@@ -25,6 +25,7 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'sheerun/vim-polyglot'
 Plugin 'rhysd/vim-clang-format'
 Plugin 'vim-scripts/DoxygenToolkit.vim'
+Plugin 'tell-k/vim-autopep8'
 
 call vundle#end()
 
