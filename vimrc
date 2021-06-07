@@ -8,7 +8,11 @@ Plugin 'VundleVim/Vundle.vim'
 
 Plugin 'christoomey/vim-tmux-navigator'
 
-Plugin 'romainl/flattened'
+Plugin 'morhetz/gruvbox'
+Plugin 'arcticicestudio/nord-vim'
+Plugin 'sonph/onehalf', {'rtp': 'vim/'}
+Plugin 'jacoborus/tender.vim'
+Plugin 'altercation/vim-colors-solarized'
 
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
@@ -28,10 +32,7 @@ filetype plugin indent on
 syntax on
 
 " colorscheme
-colorscheme flattened_dark
-
-" status line
-let g:airline_theme='solarized'
+colorscheme gruvbox
 
 " NERDTree
 nnoremap <Leader>n :NERDTreeToggle<CR>
@@ -47,9 +48,6 @@ set softtabstop=4
 set shiftwidth=4
 set expandtab
 
-" right margin
-set colorcolumn=81
-
 " split switch
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
@@ -60,9 +58,16 @@ nnoremap <C-l> <C-w>l
 augroup c
     autocmd!
     autocmd BufNewFile,BufFilePre,BufRead *.h,*.c set filetype=c.doxygen
+    autocmd filetype c set colorcolumn=81
 augroup end
 
 augroup cpp
     autocmd!
     autocmd BufNewFile,BufFilePre,BufRead *.hpp,*.cpp,*.tpp set filetype=cpp.doxygen
+    autocmd filetype cpp set colorcolumn=81
+augroup end
+
+augroup python
+    autocmd!
+    autocmd filetype python set colorcolumn=81
 augroup end
