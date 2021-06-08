@@ -33,8 +33,8 @@ filetype plugin indent on
 syntax on
 
 " colorscheme
-set background=dark
-colorscheme gruvbox
+set background=light
+colorscheme solarized
 
 " NERDTree
 nnoremap <Leader>n :NERDTreeToggle<CR>
