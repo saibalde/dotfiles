@@ -69,6 +69,7 @@ augroup cpp
     autocmd FileType cpp set colorcolumn=81
 augroup end
 
+let g:autopep8_disable_show_diff=1
 augroup python
     autocmd!
     autocmd FileType python set colorcolumn=81
