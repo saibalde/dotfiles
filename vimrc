@@ -10,8 +10,6 @@ Plugin 'christoomey/vim-tmux-navigator'
 
 Plugin 'morhetz/gruvbox'
 Plugin 'arcticicestudio/nord-vim'
-Plugin 'sonph/onehalf', {'rtp': 'vim/'}
-Plugin 'jacoborus/tender.vim'
 Plugin 'altercation/vim-colors-solarized'
 
 Plugin 'vim-airline/vim-airline'
@@ -33,8 +31,8 @@ filetype plugin indent on
 syntax on
 
 " colorscheme
-set background=light
-colorscheme solarized
+set background=dark
+colorscheme nord
 
 " NERDTree
 nnoremap <Leader>n :NERDTreeToggle<CR>
