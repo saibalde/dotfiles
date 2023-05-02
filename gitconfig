@@ -1,0 +1,11 @@
+[user]
+    name = Saibal De
+    email = saibal.de.bnk@gmail.com
+[core]
+    excludesFile = ~/.gitignore
+[color]
+    ui = auto
+[alias]
+    lg = log --all --graph --decorate
+[init]
+    defaultBranch = main

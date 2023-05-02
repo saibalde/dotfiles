@@ -1,0 +1,415 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: Saibal De
+
+* Better Defaults
+
+I adapt a set of settings found in various Emacs configurations.
+
+#+begin_src emacs-lisp
+  (setq gc-cons-threshold (* 100 1024 1024))
+  (setq large-file-warning-threshold (* 100 1024 1024))
+
+  (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+  (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
+
+  (setq locale-coding-system 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (prefer-coding-system 'utf-8)
+
+  (setq ring-bell-function 'ignore)
+
+  (setq-default indent-tabs-mode nil)
+  (setq-default require-final-newline t)
+
+  (defalias 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+* Custom Settings
+
+I've separated the custom settings (via `custom-set-variables` and
+`custom-set-faces` in a separate `custom.el` file, which is excluded
+from version control. This way, some machine specific settings
+(e.g. the font) are separated from the main configuration, and can be
+updated easily.
+
+#+begin_src emacs-lisp
+  (setq custom-file "~/.emacs.d/custom.el")
+  (when (file-exists-p custom-file)
+    (load custom-file))
+#+end_src
+
+* Appearance
+
+I use `doom-themes` for a decent collection of color schemes,
+`telephone-line` for a simple [[https://github.com/vim-airline/vim-airline][vim-airline]] like mode line, and `dimmer`
+to fade out inactive windows when editing files in split view.
+
+#+begin_src emacs-lisp
+  (use-package doom-themes
+    :ensure t
+    :config
+    (setq doom-themes-enable-bold t)
+    (setq doom-themes-enable-italic t)
+    (load-theme 'doom-one-light t)
+    (doom-themes-org-config))
+
+  (use-package telephone-line
+    :ensure t
+    :config
+    (telephone-line-mode 1))
+
+  (use-package dimmer
+    :ensure t
+    :config
+    (setq dimmer-fraction 0.5)
+    (dimmer-configure-which-key)
+    (dimmer-configure-magit)
+    (dimmer-configure-org)
+    (dimmer-mode t))
+#+end_src
+
+* TRAMP Path Modifications
+
+TRAMP is excellent for remote editing! Here I add a few directories,
+containing locally installed/symlinked software on remote machines, to
+the TRAMP binary search path.
+
+This should appear towards the top of the Emacs configuration - in
+past, I recall having trouble with `magit` when the system-installed
+`git` was too old, but I had a local build of newer `git`.
+
+#+begin_src emacs-lisp
+  (use-package tramp
+    :ensure nil
+    :config
+    (add-to-list 'tramp-remote-path "/home/saibal/.local/bin")
+    (add-to-list 'tramp-remote-path "/home/saibalde/.local/bin")
+    (add-to-list 'tramp-remote-path "/home/sde/.local/bin"))
+#+end_src
+
+* Shell Path Loading
+
+When started via the GUI application, sometimes Emacs does not read
+the modified `$PATH` shell variable (especially on MacOS). The
+following package provides a fix; however, it can increase the startup
+time.
+
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :ensure t
+    :config
+    (exec-path-from-shell-initialize))
+#+end_src
+
+* Packages
+
+** Help Messages
+
+Provides help messages (via `C-h` keybinding) in useful formats:
+
+#+begin_src emacs-lisp
+  (use-package helpful
+    :ensure t
+    :bind
+    ("C-h f" . helpful-callable)
+    ("C-h v" . helpful-variable)
+    ("C-h k" . helpful-key))
+#+end_src
+
+** Key Query
+
+When entering complex keybindings, pausing in the middle brings up a
+narrowing list of available options:
+
+#+begin_src emacs-lisp
+  (use-package which-key
+    :ensure t
+    :config
+    (which-key-mode))
+#+end_src
+
+** Text Editing Basics
+
+`adaptive-wrap` enables line continuations to have same (virtual)
+indent, and `visual-fill-column` can simulate a fixed width for long
+lines without inserting line break characters.
+
+#+begin_src emacs-lisp
+  (use-package adaptive-wrap
+    :ensure t
+    :config
+    (setq-default adaptive-wrap-extra-indent 0))
+
+  (use-package visual-fill-column
+    :ensure t)
+
+  (add-hook 'text-mode-hook 'visual-line-mode)
+  (add-hook 'text-mode-hook 'flyspell-mode)
+
+  (add-hook 'prog-mode-hook 'toggle-truncate-lines)
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
+  (add-hook 'shell-mode-hook 'toggle-truncate-lines)
+  (add-hook 'shell-mode-hook (lambda () (setq comint-process-echoes t)))
+#+end_src
+
+** Minibuffer Completion
+
+#+begin_src emacs-lisp
+  (use-package ivy
+    :ensure t
+    :bind
+    ("C-s" . swiper)
+    (:map ivy-minibuffer-map
+          ("C-j" . ivy-next-line)
+          ("C-k" . ivy-previous-line)
+          ("C-h" . ivy-alt-done)
+          ("C-l" . ivy-immediate-done))
+    (:map ivy-switch-buffer-map
+          ("C-j" . ivy-next-line)
+          ("C-k" . ivy-previous-line)
+          ("C-h" . ivy-alt-done)
+          ("C-l" . ivy-immediate-done))
+    :init
+    (use-package swiper
+      :ensure t)
+    :config
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers t)
+    (setq ivy-count-format "(%d/%d) ")
+    (setq ivy-wrap t))
+#+end_src
+
+** Autocompletion
+
+#+begin_src emacs-lisp
+  (use-package smartparens-config
+    :ensure smartparens
+    :hook
+    (prog-mode . smartparens-mode))
+
+  (use-package company
+    :ensure t
+    :hook
+    (text-mode . company-mode)
+    (prog-mode . company-mode)
+    :config
+    (setq company-backends '(company-capf))
+    (setq company-minimum-prefix-length 1)
+    (setq company-idle-delay 0.0))
+#+end_src
+
+** Programming
+
+#+begin_src emacs-lisp
+  (use-package eglot
+    :bind
+    (:map eglot-mode-map
+          ("C-c f" . eglot-format-buffer))
+    :ensure t)
+
+  (use-package highlight-doxygen
+    :ensure t
+    :hook
+    (c-mode . highlight-doxygen-mode)
+    (c++-mode . highlight-doxygen-mode))
+
+  (use-package cmake-mode
+    :ensure t
+    :mode
+    ("CMakeLists.txt" . cmake-mode)
+    ("\\.cmake\\'" . cmake-mode))
+#+end_src
+
+** Git Interface
+
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t
+    :bind
+    ("C-c g" . magit-status))
+#+end_src
+
+** Org Mode
+
+#+begin_src emacs-lisp
+  (use-package org
+    :ensure t
+    :bind
+    ("C-c a" . org-agenda)
+    ("C-c c" . org-capture)
+    :config
+    (require 'org-tempo)
+
+    (setq org-startup-folded t)
+    (setq org-startup-indented t)
+    (setq org-src-fontify-natively t)
+    (setq org-log-done 'time)
+    (setq org-tags-column -80)
+
+    (setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                              (sequence "HOLD(h)" "WAIT(w)" "|" "VOID(v)")))
+    (setq org-use-fast-todo-selection t)
+
+    (setq org-capture-templates
+          '(("i" "Inbox" entry
+             (file "~/Documents/tasks/inbox.org")
+             "* TODO %?\nAdded: %U")
+            ("m" "Meeting" entry
+             (file+headline "~/Documents/tasks/agenda.org" "Future")
+             "* %?\n%T")
+            ("n" "Note" entry
+             (file "~/Documents/notes/notes.org")
+             "* Note - %a\nAdded: %U\n%?")))
+
+    (setq org-agenda-files (list "~/Documents/tasks/inbox.org"
+                                 "~/Documents/tasks/agenda.org"
+                                 "~/Documents/tasks/tasks.org"))
+    (setq org-agenda-compact-blocks t)
+    (setq org-agenda-custom-commands
+          '(("c" "Custom Agenda"
+             ((agenda ""
+                      ((org-agenda-span 7)
+                       (org-agenda-start-on-weekday 0)
+                       (org-deadline-warning-days 28)))))
+            ("n" "Next Tasks"
+             ((todo "NEXT"
+                    ((org-agenda-overriding-header
+                      "Project Tasks:\n--------------\n")))
+              (tags-todo "CATEGORY=\"oneoff\""
+                         ((org-agenda-overriding-header
+                           "\nOne-Off Tasks\n-------------\n")))))
+            ("d" "Daily Review"
+             ((tags "inbox"
+                    ((org-agenda-overriding-header
+                      "Inbox:\n------\n")))))))
+
+    (defun sde/org-note-files ()
+      (directory-files "~/Documents/notes" t ".*\\.org$"))
+    (setq org-refile-targets '((nil :maxlevel . 2)
+                               (org-agenda-files :maxlevel . 2)
+                               (sde/org-note-files :maxlevel . 2)))
+
+    (setq org-latex-pdf-process
+          (list "latexmk -shell-escape -bibtex -f -pdf %f")))
+#+end_src
+
+** File Encryption
+
+#+begin_src emacs-lisp
+  (use-package epa-file
+    :ensure nil
+    :config
+    (setq epa-pinentry-mode 'loopback)
+    (epa-file-enable))
+#+end_src
+
+** LaTeX
+
+#+begin_src emacs-lisp
+  (use-package tex
+    :ensure auctex
+    :hook
+    (LaTeX-mode . (lambda () (TeX-fold-mode 1)))
+    (LaTeX-mode . turn-on-reftex)
+    (LaTeX-mode . adaptive-wrap-prefix-mode)
+    :config
+    (setq-default TeX-master nil)
+    (setq TeX-parse-self t)
+    (setq TeX-auto-save t)
+    (setq TeX-PDF-mode t)
+    (setq font-latex-fontify-script nil)
+    (setq font-latex-fontify-sectioning 'color)
+    (setq reftex-plug-into-AUCTeX t))
+#+end_src
+
+** Reference Manager
+
+#+begin_src emacs-lisp
+  (use-package bibtex
+    :ensure nil
+    :bind
+    (:map bibtex-mode-map
+          ("C-c f" . my/bibtex-reformat))
+    :config
+    (setq bibtex-align-at-equal-sign t)
+    (setq bibtex-entry-format '(opts-or-alts
+                                required-fields
+                                page-dashes
+                                last-comma
+                                unify-case
+                                sort-fields))
+    (defun my/bibtex-reformat()
+      "reformat bibtex file"
+      (interactive)
+      (defvar fill-column-old)
+      (setq fill-column-old fill-column)
+      (setq fill-column 1000000)
+      (bibtex-sort-buffer)
+      (bibtex-reformat)
+      (save-buffer)
+      (setq fill-column fill-column-old)))
+
+  (use-package ivy-bibtex
+    :ensure t
+    :after ivy
+    :bind
+    ("C-c r" . ivy-bibtex)
+    :config
+    (setq ivy-re-builders-alist
+          '((ivy-bibtex . ivy--regex-ignore-order)
+            (t . ivy--regex-plus)))
+
+    (setq bibtex-completion-bibliography "~/Documents/references/references.bib")
+    (setq bibtex-completion-library-path "~/Documents/references")
+    (setq bibtex-completion-pdf-field "file")
+    (setq bibtex-completion-notes-path "~/Documents/references/notes.org")
+    (setq bibtex-completion-notes-template-one-file
+          (concat "\n"
+                  "** ${year} - ${author-or-editor} - ${title}\n"
+                  ":PROPERTIES:\n"
+                  ":Custom_ID: ${=key=}\n"
+                  ":END:\n"
+                  "%?\n"))
+    (setq bibtex-completion-additional-search-fields '(keywords))
+    (setq bibtex-completion-pdf-symbol "P")
+    (setq bibtex-completion-notes-symbol "N")
+    (setq bibtex-completion-display-formats
+          '((t . "${=has-pdf=:1} ${=has-note=:1} ${year:4} ${author:36} ${title:*}")))
+    (setq bibtex-completion-pdf-open-function
+          (lambda (fpath) (call-process "open" nil 0 nil fpath)))
+
+    (advice-add 'bibtex-completion-candidates :filter-return 'reverse))
+
+  (use-package org-ref
+    :ensure t
+    :bind
+    (:map org-mode-map
+          ("C-c i" . 'org-ref-insert-link))
+    :config
+    (require 'org-ref)
+    (require 'org-ref-ivy))
+#+end_src
+
+** Vim Emulation
+
+#+begin_src emacs-lisp
+  (use-package evil
+    :ensure t
+    :init
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-respect-visual-line-mode t)
+    :config
+    (evil-mode 1))
+
+  (use-package evil-collection
+    :ensure t
+    :after evil
+    :config
+    (evil-collection-init)
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys))
+#+end_src
