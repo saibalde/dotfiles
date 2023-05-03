@@ -365,7 +365,7 @@ lines without inserting line break characters.
     (setq bibtex-completion-bibliography "~/Documents/references/references.bib")
     (setq bibtex-completion-library-path "~/Documents/references")
     (setq bibtex-completion-pdf-field "file")
-    (setq bibtex-completion-notes-path "~/Documents/references/notes.org")
+    (setq bibtex-completion-notes-path "~/Documents/references/references.org")
     (setq bibtex-completion-notes-template-one-file
           (concat "\n"
                   "** ${year} - ${author-or-editor} - ${title}\n"
