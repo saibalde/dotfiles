@@ -52,7 +52,7 @@ to fade out inactive windows when editing files in split view.
     :config
     (setq doom-themes-enable-bold t)
     (setq doom-themes-enable-italic t)
-    (load-theme 'doom-one-light t)
+    (load-theme 'doom-opera-light t)
     (doom-themes-org-config))
 
   (use-package telephone-line
@@ -147,6 +147,7 @@ lines without inserting line break characters.
 
   (add-hook 'text-mode-hook 'visual-line-mode)
   (add-hook 'text-mode-hook 'flyspell-mode)
+  (add-hook 'text-mode-hook (lambda() (set-fill-column 80)))
 
   (add-hook 'prog-mode-hook 'toggle-truncate-lines)
   (add-hook 'prog-mode-hook 'flyspell-prog-mode)
@@ -254,19 +255,15 @@ lines without inserting line break characters.
     (setq org-use-fast-todo-selection t)
 
     (setq org-capture-templates
-          '(("i" "Inbox" entry
-             (file "~/Documents/tasks/inbox.org")
+          '(("t" "Task" entry
+             (file "~/OrgFiles/tasks/inbox.org")
              "* TODO %?\nAdded: %U")
             ("m" "Meeting" entry
-             (file+headline "~/Documents/tasks/agenda.org" "Future")
-             "* %?\n%T")
-            ("n" "Note" entry
-             (file "~/Documents/notes/notes.org")
-             "* Note - %a\nAdded: %U\n%?")))
+             (file "~/OrgFiles/tasks/inbox.org")
+             "* %?\n%T")))
 
-    (setq org-agenda-files (list "~/Documents/tasks/inbox.org"
-                                 "~/Documents/tasks/agenda.org"
-                                 "~/Documents/tasks/tasks.org"))
+    (setq org-agenda-files (list "~/OrgFiles/tasks"
+                                 "~/OrgFiles/projects"))
     (setq org-agenda-compact-blocks t)
     (setq org-agenda-custom-commands
           '(("c" "Custom Agenda"
@@ -286,11 +283,8 @@ lines without inserting line break characters.
                     ((org-agenda-overriding-header
                       "Inbox:\n------\n")))))))
 
-    (defun sde/org-note-files ()
-      (directory-files "~/Documents/notes" t ".*\\.org$"))
     (setq org-refile-targets '((nil :maxlevel . 2)
-                               (org-agenda-files :maxlevel . 2)
-                               (sde/org-note-files :maxlevel . 2)))
+                               (org-agenda-files :maxlevel . 2)))
 
     (setq org-latex-pdf-process
           (list "latexmk -shell-escape -bibtex -f -pdf %f")))
@@ -362,10 +356,10 @@ lines without inserting line break characters.
           '((ivy-bibtex . ivy--regex-ignore-order)
             (t . ivy--regex-plus)))
 
-    (setq bibtex-completion-bibliography "~/Documents/references/references.bib")
-    (setq bibtex-completion-library-path "~/Documents/references")
+    (setq bibtex-completion-bibliography "~/OrgFiles/references/references.bib")
+    (setq bibtex-completion-library-path "~/OrgFiles/references/pdfs/")
     (setq bibtex-completion-pdf-field "file")
-    (setq bibtex-completion-notes-path "~/Documents/references/references.org")
+    (setq bibtex-completion-notes-path "~/OrgFiles/references/notes")
     (setq bibtex-completion-notes-template-one-file
           (concat "\n"
                   "** ${year} - ${author-or-editor} - ${title}\n"
@@ -373,6 +367,10 @@ lines without inserting line break characters.
                   ":Custom_ID: ${=key=}\n"
                   ":END:\n"
                   "%?\n"))
+    (setq bibtex-completion-notes-template-multiple-files
+          (concat "#+TITLE: ${author-or-editor} (${year}). ${title}\n"
+                  "#+CUSTOM_ID: ${=key=}\n"
+                  "\n"))
     (setq bibtex-completion-additional-search-fields '(keywords))
     (setq bibtex-completion-pdf-symbol "P")
     (setq bibtex-completion-notes-symbol "N")
