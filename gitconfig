@@ -6,6 +6,6 @@
 [color]
     ui = auto
 [alias]
-    lg = log --all --graph --decorate
+    lg = log --all --graph --pretty=format:'%C(green)%h%Creset %s\n        %C(blue)%an <%ae>%Creset\n        %C(cyan)%ci%Creset%C(red)%d%Creset'
 [init]
     defaultBranch = main
