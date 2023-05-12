@@ -256,14 +256,13 @@ lines without inserting line break characters.
 
     (setq org-capture-templates
           '(("t" "Task" entry
-             (file "~/OrgFiles/tasks/inbox.org")
+             (file "~/OrgFiles/task_inbox.org")
              "* TODO %?\nAdded: %U")
             ("m" "Meeting" entry
-             (file "~/OrgFiles/tasks/inbox.org")
+             (file "~/OrgFiles/task_inbox.org")
              "* %?\n%T")))
 
-    (setq org-agenda-files (list "~/OrgFiles/tasks"
-                                 "~/OrgFiles/projects"))
+    (setq org-agenda-files (file-expand-wildcards "~/OrgFiles/*.org"))
     (setq org-agenda-compact-blocks t)
     (setq org-agenda-custom-commands
           '(("c" "Custom Agenda"
@@ -356,10 +355,10 @@ lines without inserting line break characters.
           '((ivy-bibtex . ivy--regex-ignore-order)
             (t . ivy--regex-plus)))
 
-    (setq bibtex-completion-bibliography "~/OrgFiles/references/references.bib")
-    (setq bibtex-completion-library-path "~/OrgFiles/references/pdfs/")
+    (setq bibtex-completion-bibliography "~/OrgFiles/refs_all.bib")
+    (setq bibtex-completion-library-path "~/OrgFiles/refs_pdfs/")
     (setq bibtex-completion-pdf-field "file")
-    (setq bibtex-completion-notes-path "~/OrgFiles/references/notes")
+    (setq bibtex-completion-notes-path "~/OrgFiles/refs_notes")
     (setq bibtex-completion-notes-template-one-file
           (concat "\n"
                   "** ${year} - ${author-or-editor} - ${title}\n"
