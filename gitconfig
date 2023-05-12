@@ -6,6 +6,6 @@
 [color]
     ui = auto
 [alias]
-    lg = log --all --graph --pretty=format:'%C(green)%h%Creset %s\n        %C(blue)%an <%ae>%Creset\n        %C(cyan)%ci%Creset%C(red)%d%Creset'
+    lg = log --all --graph --pretty=tformat:'%C(auto)%h%Creset %s%C(auto)%d%Creset\n        %C(magenta)%an <%ae>%Creset %C(blue)(%cr)%Creset' --abbrev-commit
 [init]
     defaultBranch = main
