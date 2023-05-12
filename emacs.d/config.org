@@ -262,7 +262,8 @@ lines without inserting line break characters.
              (file "~/OrgFiles/task_inbox.org")
              "* %?\n%T")))
 
-    (setq org-agenda-files (file-expand-wildcards "~/OrgFiles/*.org"))
+    (setq org-agenda-files (append (file-expand-wildcards "~/OrgFiles/*.org")
+                                   '("~/Dropbox/tasks/phone.org")))
     (setq org-agenda-compact-blocks t)
     (setq org-agenda-custom-commands
           '(("c" "Custom Agenda"
