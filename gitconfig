@@ -3,6 +3,7 @@
     email = saibal.de.bnk@gmail.com
 [core]
     excludesFile = ~/.gitignore
+    editor = vim
 [color]
     ui = auto
 [alias]
