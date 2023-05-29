@@ -14,11 +14,14 @@ local packer_bootstrap = ensure_packer()
 require('packer').startup(function(use)
     use 'wbthomason/packer.nvim'
 
-    use 'Shatur/neovim-ayu'
-
-    use 'nvim-tree/nvim-tree.lua'
+    use {
+        'catppuccin/nvim',
+        as = 'catppuccin'
+    }
 
     use 'nvim-lualine/lualine.nvim'
+
+    use 'nvim-tree/nvim-tree.lua'
 
     use {
         'nvim-telescope/telescope.nvim',
@@ -45,11 +48,11 @@ require('packer').startup(function(use)
 end)
 
 vim.o.termguicolors = true
-require('ayu').colorscheme()
+vim.cmd('colorscheme catppuccin-latte')
 
 require('lualine').setup({
     options = {
-        theme = 'ayu',
+        theme = 'catppuccin',
         icons_enabled = false,
         component_separators = {
             left = '',

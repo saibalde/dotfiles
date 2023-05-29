@@ -72,23 +72,17 @@ fix; however, it can increase the startup time.
 * Interface
 ** Appearance
 
-I use `doom-themes` for a decent collection of color schemes, `telephone-line`
-for a simple [[https://github.com/vim-airline/vim-airline][vim-airline]] like mode line, and `dimmer` to fade out inactive
-windows when editing files in split view.
-
 #+begin_src emacs-lisp
-  (use-package doom-themes
+  (use-package catppuccin-theme
     :ensure t
     :config
-    (setq doom-themes-enable-bold t)
-    (setq doom-themes-enable-italic t)
-    (load-theme 'doom-opera-light t)
-    (doom-themes-org-config))
+    (setq catppuccin-flavor 'latte)
+    (load-theme 'catppuccin t))
 
-  (use-package telephone-line
+  (use-package mood-line
     :ensure t
     :config
-    (telephone-line-mode 1))
+    (mood-line-mode))
 
   (use-package dimmer
     :ensure t

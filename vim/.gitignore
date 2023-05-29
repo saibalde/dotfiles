@@ -1,0 +1,9 @@
+/*
+
+!.gitignore
+
+!vimrc
+
+!autoload
+autoload/*
+!autoload/plug.vim

@@ -1,0 +1,36 @@
+call plug#begin()
+
+Plug 'catppuccin/vim', { 'as': 'catppuccin' }
+
+Plug 'vim-airline/vim-airline'
+
+Plug 'preservim/nerdtree'
+
+call plug#end()
+
+set termguicolors
+colorscheme catppuccin_latte
+
+let g:airline_theme = 'catppuccin_latte'
+
+nnoremap <leader>n :NERDTreeToggle<cr>
+
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set expandtab
+
+set autoindent
+set smartindent
+
+set number
+set numberwidth=6
+set signcolumn=number
+
+set breakindent
+set linebreak
+
+augroup gitcommit
+    autocmd!
+    autocmd FileType gitcommit setlocal textwidth=72 spell
+augroup end
