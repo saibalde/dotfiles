@@ -29,10 +29,9 @@ I adapt a set of settings found in various Emacs configurations.
 * Custom Settings
 
 I've separated the custom settings (via `custom-set-variables` and
-`custom-set-faces` in a separate `custom.el` file, which is excluded
-from version control. This way, some machine specific settings
-(e.g. the font) are separated from the main configuration, and can be
-updated easily.
+`custom-set-faces` in a separate `custom.el` file, which is excluded from
+version control. This way, some machine specific settings (e.g. the font) are
+separated from the main configuration, and can be updated easily.
 
 #+begin_src emacs-lisp
   (setq custom-file "~/.emacs.d/custom.el")
@@ -40,11 +39,42 @@ updated easily.
     (load custom-file))
 #+end_src
 
-* Appearance
+* TRAMP Path Modifications
 
-I use `doom-themes` for a decent collection of color schemes,
-`telephone-line` for a simple [[https://github.com/vim-airline/vim-airline][vim-airline]] like mode line, and `dimmer`
-to fade out inactive windows when editing files in split view.
+TRAMP is excellent for remote editing! Here I add a few directories, containing
+locally installed/symlinked software on remote machines, to the TRAMP binary
+search path.  This should appear towards the top of the Emacs configuration - in
+past, I recall having trouble with `magit` when the system-installed `git` was
+too old, but I had a local build of newer `git`.
+
+#+begin_src emacs-lisp
+  (use-package tramp
+    :ensure nil
+    :config
+    (add-to-list 'tramp-remote-path "/home/saibal/.local/bin")
+    (add-to-list 'tramp-remote-path "/home/saibalde/.local/bin")
+    (add-to-list 'tramp-remote-path "/home/sde/.local/bin"))
+#+end_src
+
+* Shell Path Loading
+
+When started via the GUI application, sometimes Emacs does not read the modified
+`$PATH` shell variable (especially on MacOS). The following package provides a
+fix; however, it can increase the startup time.
+
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :ensure t
+    :config
+    (exec-path-from-shell-initialize))
+#+end_src
+
+* Interface
+** Appearance
+
+I use `doom-themes` for a decent collection of color schemes, `telephone-line`
+for a simple [[https://github.com/vim-airline/vim-airline][vim-airline]] like mode line, and `dimmer` to fade out inactive
+windows when editing files in split view.
 
 #+begin_src emacs-lisp
   (use-package doom-themes
@@ -70,41 +100,6 @@ to fade out inactive windows when editing files in split view.
     (dimmer-mode t))
 #+end_src
 
-* TRAMP Path Modifications
-
-TRAMP is excellent for remote editing! Here I add a few directories,
-containing locally installed/symlinked software on remote machines, to
-the TRAMP binary search path.
-
-This should appear towards the top of the Emacs configuration - in
-past, I recall having trouble with `magit` when the system-installed
-`git` was too old, but I had a local build of newer `git`.
-
-#+begin_src emacs-lisp
-  (use-package tramp
-    :ensure nil
-    :config
-    (add-to-list 'tramp-remote-path "/home/saibal/.local/bin")
-    (add-to-list 'tramp-remote-path "/home/saibalde/.local/bin")
-    (add-to-list 'tramp-remote-path "/home/sde/.local/bin"))
-#+end_src
-
-* Shell Path Loading
-
-When started via the GUI application, sometimes Emacs does not read
-the modified `$PATH` shell variable (especially on MacOS). The
-following package provides a fix; however, it can increase the startup
-time.
-
-#+begin_src emacs-lisp
-  (use-package exec-path-from-shell
-    :ensure t
-    :config
-    (exec-path-from-shell-initialize))
-#+end_src
-
-* Packages
-
 ** Help Messages
 
 Provides help messages (via `C-h` keybinding) in useful formats:
@@ -120,8 +115,8 @@ Provides help messages (via `C-h` keybinding) in useful formats:
 
 ** Key Query
 
-When entering complex keybindings, pausing in the middle brings up a
-narrowing list of available options:
+When entering complex keybindings, pausing in the middle brings up a narrowing
+list of available options:
 
 #+begin_src emacs-lisp
   (use-package which-key
@@ -130,33 +125,7 @@ narrowing list of available options:
     (which-key-mode))
 #+end_src
 
-** Text Editing Basics
-
-`adaptive-wrap` enables line continuations to have same (virtual)
-indent, and `visual-fill-column` can simulate a fixed width for long
-lines without inserting line break characters.
-
-#+begin_src emacs-lisp
-  (use-package adaptive-wrap
-    :ensure t
-    :config
-    (setq-default adaptive-wrap-extra-indent 0))
-
-  (use-package visual-fill-column
-    :ensure t)
-
-  (add-hook 'text-mode-hook 'visual-line-mode)
-  (add-hook 'text-mode-hook 'flyspell-mode)
-  (add-hook 'text-mode-hook (lambda() (set-fill-column 80)))
-
-  (add-hook 'prog-mode-hook 'toggle-truncate-lines)
-  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-
-  (add-hook 'shell-mode-hook 'toggle-truncate-lines)
-  (add-hook 'shell-mode-hook (lambda () (setq comint-process-echoes t)))
-#+end_src
-
-** Minibuffer Completion
+* Minibuffer Completion
 
 #+begin_src emacs-lisp
   (use-package ivy
@@ -183,6 +152,46 @@ lines without inserting line break characters.
     (setq ivy-wrap t))
 #+end_src
 
+* Git Interface
+
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t
+    :bind
+    ("C-c g" . magit-status))
+#+end_src
+
+* Basic Editing
+
+`adaptive-wrap` enables line continuations to have same (virtual) indent, and
+`visual-fill-column` enables virtual line wraps at fill column.
+
+#+begin_src emacs-lisp
+  (use-package visual-fill-column
+    :hook
+    (markdown-mode . visual-fill-column-mode)
+    (tex-mode . visual-fill-column-mode)
+    :ensure t)
+
+  (use-package adaptive-wrap
+    :ensure t
+    :hook
+    (visual-fill-column-mode . adaptive-wrap-prefix-mode)
+    :config
+    (setq-default adaptive-wrap-extra-indent 0))
+
+  (add-hook 'text-mode-hook 'visual-line-mode)
+  (add-hook 'text-mode-hook 'flyspell-mode)
+  (add-hook 'text-mode-hook (lambda() (set-fill-column 80)))
+
+  (add-hook 'prog-mode-hook 'toggle-truncate-lines)
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
+  (add-hook 'shell-mode-hook 'toggle-truncate-lines)
+  (add-hook 'shell-mode-hook (lambda () (setq comint-process-echoes t)))
+#+end_src
+
+* Code Editing
 ** Autocompletion
 
 #+begin_src emacs-lisp
@@ -202,7 +211,7 @@ lines without inserting line break characters.
     (setq company-idle-delay 0.0))
 #+end_src
 
-** Programming
+** Language Servers
 
 #+begin_src emacs-lisp
   (use-package eglot
@@ -210,13 +219,22 @@ lines without inserting line break characters.
     (:map eglot-mode-map
           ("C-c f" . eglot-format-buffer))
     :ensure t)
+#+end_src
 
+** Programming Modes
+*** Doxygen
+
+#+begin_src emacs-lisp
   (use-package highlight-doxygen
     :ensure t
     :hook
     (c-mode . highlight-doxygen-mode)
     (c++-mode . highlight-doxygen-mode))
+#+end_src
 
+*** CMake
+
+#+begin_src emacs-lisp
   (use-package cmake-mode
     :ensure t
     :mode
@@ -224,13 +242,24 @@ lines without inserting line break characters.
     ("\\.cmake\\'" . cmake-mode))
 #+end_src
 
-** Git Interface
+* Text Editing
+** LaTeX
 
 #+begin_src emacs-lisp
-  (use-package magit
-    :ensure t
-    :bind
-    ("C-c g" . magit-status))
+  (use-package tex
+    :ensure auctex
+    :hook
+    (LaTeX-mode . (lambda () (TeX-fold-mode 1)))
+    (LaTeX-mode . turn-on-reftex)
+    (LaTeX-mode . adaptive-wrap-prefix-mode)
+    :config
+    (setq-default TeX-master nil)
+    (setq TeX-parse-self t)
+    (setq TeX-auto-save t)
+    (setq TeX-PDF-mode t)
+    (setq font-latex-fontify-script nil)
+    (setq font-latex-fontify-sectioning 'color)
+    (setq reftex-plug-into-AUCTeX t))
 #+end_src
 
 ** Org Mode
@@ -289,36 +318,7 @@ lines without inserting line break characters.
           (list "latexmk -shell-escape -bibtex -f -pdf %f")))
 #+end_src
 
-** File Encryption
-
-#+begin_src emacs-lisp
-  (use-package epa-file
-    :ensure nil
-    :config
-    (setq epa-pinentry-mode 'loopback)
-    (epa-file-enable))
-#+end_src
-
-** LaTeX
-
-#+begin_src emacs-lisp
-  (use-package tex
-    :ensure auctex
-    :hook
-    (LaTeX-mode . (lambda () (TeX-fold-mode 1)))
-    (LaTeX-mode . turn-on-reftex)
-    (LaTeX-mode . adaptive-wrap-prefix-mode)
-    :config
-    (setq-default TeX-master nil)
-    (setq TeX-parse-self t)
-    (setq TeX-auto-save t)
-    (setq TeX-PDF-mode t)
-    (setq font-latex-fontify-script nil)
-    (setq font-latex-fontify-sectioning 'color)
-    (setq reftex-plug-into-AUCTeX t))
-#+end_src
-
-** Reference Manager
+* Reference Management
 
 #+begin_src emacs-lisp
   (use-package bibtex
@@ -333,17 +333,7 @@ lines without inserting line break characters.
                                 page-dashes
                                 last-comma
                                 unify-case
-                                sort-fields))
-    (defun my/bibtex-reformat()
-      "reformat bibtex file"
-      (interactive)
-      (defvar fill-column-old)
-      (setq fill-column-old fill-column)
-      (setq fill-column 1000000)
-      (bibtex-sort-buffer)
-      (bibtex-reformat)
-      (save-buffer)
-      (setq fill-column fill-column-old)))
+                                sort-fields)))
 
   (use-package ivy-bibtex
     :ensure t
@@ -390,7 +380,17 @@ lines without inserting line break characters.
     (require 'org-ref-ivy))
 #+end_src
 
-** Vim Emulation
+* File Encryption
+
+#+begin_src emacs-lisp
+  (use-package epa-file
+    :ensure nil
+    :config
+    (setq epa-pinentry-mode 'loopback)
+    (epa-file-enable))
+#+end_src
+
+* Vim Emulation
 
 #+begin_src emacs-lisp
   (use-package evil
